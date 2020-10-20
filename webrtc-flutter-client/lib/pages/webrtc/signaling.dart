@@ -360,8 +360,7 @@ class Signaling {
 
   _createOffer(String id, RTCPeerConnection pc, String media) async {
     try {
-      RTCSessionDescription s =
-          await pc.createOffer(media == 'data' ? _dcConstraints : _constraints);
+      RTCSessionDescription s = await pc.createOffer(_dcConstraints);
       pc.setLocalDescription(s);
 
       final description = {'sdp': s.sdp, 'type': s.type};

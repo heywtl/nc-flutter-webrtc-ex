@@ -39,6 +39,7 @@ class _CallBodyState extends State<CallBody> {
   bool _inCalling = false;
   final String serverIP;
   final TextEditingController textEditingController = TextEditingController();
+  int indexTab = 0;
 
   _CallBodyState({Key key, @required this.serverIP});
 
@@ -135,95 +136,137 @@ class _CallBodyState extends State<CallBody> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Consumer<CallProvider>(
-          builder: (context, provider, child) {
-            final clientId = provider.clientId;
-            return clientId.isNotEmpty
-                ? Text('$clientId')
-                : Text('P2P Call Sample');
-          },
-        ),
-        actions: <Widget>[
-          IconButton(
-            icon: const Icon(Icons.settings),
-            onPressed: null,
-            tooltip: 'setup',
-          ),
-        ],
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: _inCalling
-          ? SizedBox(
-              width: 200.0,
-              child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    FloatingActionButton(
-                      child: const Icon(Icons.switch_camera),
-                      onPressed: _switchCamera,
+    return MaterialApp(
+        home: DefaultTabController(
+            length: 2,
+            child: Scaffold(
+                appBar: AppBar(
+                    title: Consumer<CallProvider>(
+                      builder: (context, provider, child) {
+                        final clientId = provider.clientId;
+                        return clientId.isNotEmpty
+                            ? Text('$clientId')
+                            : Text('P2P Call Sample');
+                      },
                     ),
-                    FloatingActionButton(
-                      onPressed: _hangUp,
-                      tooltip: 'Hangup',
-                      child: Icon(Icons.call_end),
-                      backgroundColor: Colors.pink,
-                    ),
-                    FloatingActionButton(
-                      child: const Icon(Icons.mic_off),
-                      onPressed: _muteMic,
-                    )
-                  ]))
-          : null,
-      body: _inCalling
-          ? OrientationBuilder(builder: (context, orientation) {
-              return Container(
-                child: Stack(children: <Widget>[
-                  Positioned(
-                      left: 0.0,
-                      right: 0.0,
-                      top: 0.0,
-                      bottom: 0.0,
-                      child: Container(
-                        margin: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
-                        width: MediaQuery.of(context).size.width,
-                        height: MediaQuery.of(context).size.height,
-                        child: RTCVideoView(_remoteRenderer),
-                        decoration: BoxDecoration(color: Colors.black54),
-                      )),
-                  Positioned(
-                    left: 20.0,
-                    top: 20.0,
-                    child: Container(
-                      width: orientation == Orientation.portrait ? 90.0 : 120.0,
-                      height:
-                          orientation == Orientation.portrait ? 120.0 : 90.0,
-                      child: RTCVideoView(_localRenderer),
-                      decoration: BoxDecoration(color: Colors.black54),
-                    ),
-                  ),
-                ]),
-              );
-            })
-          : Container(
-              color: Colors.yellow,
-              child: Column(
-                children: <Widget>[
-                  TextField(
-                    controller: textEditingController,
-                  ),
-                  FlatButton(
-                    child: Text('Call'),
-                    color: Colors.green,
-                    onPressed: () {
-                      _invitePeer(context, textEditingController.text, false);
-                    },
-                  )
-                ],
-              ),
-            ),
-    );
+                    actions: <Widget>[
+                      IconButton(
+                        icon: const Icon(Icons.settings),
+                        onPressed: null,
+                        tooltip: 'setup',
+                      ),
+                    ],
+                    bottom: TabBar(
+                      onTap: (index) {
+                        setState(() {
+                          indexTab = index;
+                        });
+                      },
+                      tabs: [
+                        Tab(text: "Câmera"),
+                        Tab(text: "Stream"),
+                      ],
+                    )),
+                floatingActionButtonLocation:
+                    FloatingActionButtonLocation.centerFloat,
+                floatingActionButton: _inCalling
+                    ? SizedBox(
+                        width: 200.0,
+                        child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              FloatingActionButton(
+                                child: const Icon(Icons.switch_camera),
+                                onPressed: _switchCamera,
+                              ),
+                              FloatingActionButton(
+                                onPressed: _hangUp,
+                                tooltip: 'Hangup',
+                                child: Icon(Icons.call_end),
+                                backgroundColor: Colors.pink,
+                              ),
+                              FloatingActionButton(
+                                child: const Icon(Icons.mic_off),
+                                onPressed: _muteMic,
+                              )
+                            ]))
+                    : null,
+                body: TabBarView(children: [
+                  _inCalling
+                      ? OrientationBuilder(builder: (context, orientation) {
+                          return Container(
+                            child: Positioned(
+                                left: 0.0,
+                                right: 0.0,
+                                top: 0.0,
+                                bottom: 0.0,
+                                child: Container(
+                                  margin:
+                                      EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
+                                  width: MediaQuery.of(context).size.width,
+                                  height: MediaQuery.of(context).size.height,
+                                  child: RTCVideoView(_localRenderer),
+                                  decoration:
+                                      BoxDecoration(color: Colors.black54),
+                                )),
+                          );
+                        })
+                      : Container(
+                          color: Colors.white,
+                          child: Column(
+                            children: <Widget>[
+                              TextField(
+                                controller: textEditingController,
+                              ),
+                              FlatButton(
+                                child: Text('Call'),
+                                color: Colors.green,
+                                onPressed: () {
+                                  _invitePeer(context,
+                                      textEditingController.text, false);
+                                },
+                              )
+                            ],
+                          ),
+                        ),
+                  _inCalling
+                      ? OrientationBuilder(builder: (context, orientation) {
+                          return Container(
+                            child: Positioned(
+                                left: 0.0,
+                                right: 0.0,
+                                top: 0.0,
+                                bottom: 0.0,
+                                child: Container(
+                                  margin:
+                                      EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
+                                  width: MediaQuery.of(context).size.width,
+                                  height: MediaQuery.of(context).size.height,
+                                  child: RTCVideoView(_remoteRenderer),
+                                  decoration:
+                                      BoxDecoration(color: Colors.black54),
+                                )),
+                          );
+                        })
+                      : Container(
+                          color: Colors.blue[50],
+                          child: Column(
+                            children: <Widget>[
+                              TextField(
+                                controller: textEditingController,
+                              ),
+                              FlatButton(
+                                child: Text('Call'),
+                                color: Colors.green,
+                                onPressed: () {
+                                  _invitePeer(context,
+                                      textEditingController.text, false);
+                                },
+                              )
+                            ],
+                          ),
+                        ),
+                ]))));
   }
 }
 
