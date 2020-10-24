@@ -51,6 +51,9 @@ typedef void DataChannelMessageCallback(
     RTCDataChannel dc, RTCDataChannelMessage data);
 typedef void DataChannelCallback(RTCDataChannel dc);
 
+///signaling é a classe responsável por mediar a conexão entre o aplicativo e o
+///servidor
+
 class Signaling {
   SimpleWebSocket _socket;
   var _host;
@@ -71,6 +74,7 @@ class Signaling {
   DataChannelMessageCallback onDataChannelMessage;
   DataChannelCallback onDataChannel;
 
+  ///esse mapa indica o servidor STUN
   Map<String, dynamic> _iceServers = {
     'iceServers': [
       {'url': 'stun:stun.l.google.com:19302'},
@@ -85,6 +89,7 @@ class Signaling {
     ]
   };
 
+  ///os três mapas abaixo definem parâmetros de configuração
   final Map<String, dynamic> _config = {
     'mandatory': {},
     'optional': [
@@ -110,6 +115,7 @@ class Signaling {
 
   Signaling(this._host);
 
+  ///método que fecha o stream
   close() {
     if (_localStream != null) {
       _localStream.dispose();
@@ -128,6 +134,7 @@ class Signaling {
     }
   }
 
+  ///método que cria a conexão quando o dispositivo é um host
   void invite(String peerId, String media, useScreen) {
     if (this.onStateChange != null) {
       this.onStateChange(SignalingState.CallStateNew);
@@ -142,6 +149,7 @@ class Signaling {
     });
   }
 
+  ///encerra a conexão
   void bye() {
     if (_localStream != null) {
       _localStream.dispose();
@@ -161,8 +169,11 @@ class Signaling {
     _remoteCandidates.clear();
   }
 
+  ///define as respostas do aplicativo ao receber mensagens
   void onMessage(tag, message) async {
     switch (tag) {
+
+      ///caso a mensagem seja "efetuar ligação"
       case OFFER_EVENT:
         {
           var id = 'caller';
@@ -186,6 +197,8 @@ class Signaling {
           }
         }
         break;
+
+      ///caso a mensagem seja "receber ligação"
       case ANSWER_EVENT:
         {
           var description = message;
@@ -196,6 +209,8 @@ class Signaling {
           }
         }
         break;
+
+      ///caso a mensagem venha do servidor ICE
       case ICE_CANDIDATE_EVENT:
         {
           var candidateMap = message;
@@ -225,6 +240,7 @@ class Signaling {
     }
   }
 
+  ///método que efetua a conexão
   void connect() async {
     var url = 'http://$_host:$_port';
     _socket = SimpleWebSocket(url);
@@ -253,6 +269,7 @@ class Signaling {
       } catch (e) {}
     }
 
+    ///funções que agem dependendo do estado do socket
     _socket.onOpen = () {
       print('onOpen');
       this?.onStateChange(SignalingState.ConnectionOpen);
@@ -274,6 +291,7 @@ class Signaling {
     await _socket.connect();
   }
 
+  ///cria o stream
   Future<MediaStream> createStream(media, userScreen) async {
     final Map<String, dynamic> mediaConstraints = {
       'audio': true,
@@ -289,6 +307,7 @@ class Signaling {
       }
     };
 
+    ///define o stream
     MediaStream stream = userScreen
         ? await navigator.getDisplayMedia(mediaConstraints)
         : await navigator.getUserMedia(mediaConstraints);
@@ -298,6 +317,7 @@ class Signaling {
     return stream;
   }
 
+  ///cria uma conexão entre os dois clientes
   _createPeerConnection(id, media, userScreen, {isHost = false}) async {
     if (media != 'data') _localStream = await createStream(media, userScreen);
     RTCPeerConnection pc = await createPeerConnection(_iceServers, _config);
@@ -358,6 +378,7 @@ class Signaling {
     _addDataChannel(id, channel);
   }
 
+  ///cria uma oferta de conexão
   _createOffer(String id, RTCPeerConnection pc, String media) async {
     try {
       RTCSessionDescription s = await pc.createOffer(_dcConstraints);
@@ -370,6 +391,7 @@ class Signaling {
     }
   }
 
+  ///cria uma resposta para um pedido de conexão
   _createAnswer(String id, RTCPeerConnection pc, media) async {
     try {
       RTCSessionDescription s = await pc
