@@ -6,13 +6,18 @@ import 'package:provider/provider.dart';
 
 import 'signaling.dart';
 
-class CallScreen extends StatelessWidget {
-  final String ip;
+//arquivo que contém o código da interface
 
-  const CallScreen({Key key, @required this.ip}) : super(key: key);
+class CallScreen extends StatelessWidget {
+  //classe inicializa a tela do programa
+  final String ip; //registra ip
+
+  const CallScreen({Key key, @required this.ip})
+      : super(key: key); //informações para tela do usuário
 
   @override
   Widget build(BuildContext context) {
+    //inicializa a tela pela chamada dos contrutores passando o ip
     return ChangeNotifierProvider(
       create: (_) => CallProvider(),
       child: CallBody(ip: ip),
@@ -21,6 +26,7 @@ class CallScreen extends StatelessWidget {
 }
 
 class CallBody extends StatefulWidget {
+  //classe de dados da chamada
   static String tag = 'call_sample';
 
   final String ip;
@@ -32,12 +38,15 @@ class CallBody extends StatefulWidget {
 }
 
 class _CallBodyState extends State<CallBody> {
+  //gerencia as funcionalidades apresentadas na tela
   Signaling _signaling;
-  var _selfId;
-  RTCVideoRenderer _localRenderer = RTCVideoRenderer();
-  RTCVideoRenderer _remoteRenderer = RTCVideoRenderer();
-  bool _inCalling = false;
-  final String serverIP;
+  var _selfId; //id da chamada
+  RTCVideoRenderer _localRenderer =
+      RTCVideoRenderer(); //reponsável pelo vídeo local
+  RTCVideoRenderer _remoteRenderer =
+      RTCVideoRenderer(); //responsável pelo vídeo remoto
+  bool _inCalling = false; //informa se há chamada em andamento
+  final String serverIP; //ip do servidor
   final TextEditingController textEditingController = TextEditingController();
   int indexTab = 0;
 
@@ -45,18 +54,21 @@ class _CallBodyState extends State<CallBody> {
 
   @override
   initState() {
+    //inicializa a chamada, chamando os metodos necessários para tal
     super.initState();
     initRenderers();
     _connect();
   }
 
   initRenderers() async {
+    //inicializa as variaveis responsávies pelo video
     await _localRenderer.initialize();
     await _remoteRenderer.initialize();
   }
 
   @override
   deactivate() {
+    //encerra a chamada
     super.deactivate();
     if (_signaling != null) _signaling.close();
     _localRenderer.dispose();
@@ -64,23 +76,25 @@ class _CallBodyState extends State<CallBody> {
   }
 
   void _connect() async {
+    //gerencia estado da chamada
     if (_signaling == null) {
       _signaling = Signaling(serverIP)..connect();
 
       _signaling.onStateChange = (SignalingState state) {
         switch (state) {
-          case SignalingState.CallStateNew:
+          case SignalingState.CallStateNew: //informa inicialização da chamada
             this.setState(() {
               _inCalling = true;
             });
             break;
-          case SignalingState.CallStateBye:
+          case SignalingState.CallStateBye: //informa finalização da chamada
             this.setState(() {
               _localRenderer.srcObject = null;
               _remoteRenderer.srcObject = null;
               _inCalling = false;
             });
             break;
+          //não alteram o estado da chamada
           case SignalingState.CallStateInvite:
           case SignalingState.CallStateConnected:
           case SignalingState.CallStateRinging:
@@ -94,6 +108,7 @@ class _CallBodyState extends State<CallBody> {
       _signaling.onEventUpdate = ((event) {
         final clientId = event['clientId'];
         context.read<CallProvider>().updateClientIp(clientId);
+        //atualiza o id do usuário responsável pela chamada
       });
 
       _signaling.onPeersUpdate = ((event) {
@@ -103,14 +118,17 @@ class _CallBodyState extends State<CallBody> {
       });
 
       _signaling.onLocalStream = ((stream) {
+        //video local
         _localRenderer.srcObject = stream;
       });
 
       _signaling.onAddRemoteStream = ((stream) {
+        //recebendo video remoto
         _remoteRenderer.srcObject = stream;
       });
 
       _signaling.onRemoveRemoteStream = ((stream) {
+        //não recebe video remoto
         _remoteRenderer.srcObject = null;
       });
     }
@@ -119,23 +137,27 @@ class _CallBodyState extends State<CallBody> {
   _invitePeer(context, peerId, useScreen) async {
     if (_signaling != null && peerId != _selfId) {
       _signaling.invite(peerId, 'video', useScreen);
+      //verifica condições para o convite
     }
   }
 
   _hangUp() {
     if (_signaling != null) {
       _signaling.bye();
+      //informa final da chamada
     }
   }
 
   _switchCamera() {
     _signaling.switchCamera();
+    //troca camera
   }
 
-  _muteMic() {}
+  _muteMic() {} //muta o microfone
 
   @override
   Widget build(BuildContext context) {
+    //código da interface da aplicação
     return MaterialApp(
         home: DefaultTabController(
             length: 2,
@@ -274,6 +296,7 @@ class CallProvider with ChangeNotifier {
   String clientId = "";
 
   void updateClientIp(String newClientId) {
+    //informa novo id do cliente resonsável pela chamada
     clientId = newClientId;
     notifyListeners();
   }
