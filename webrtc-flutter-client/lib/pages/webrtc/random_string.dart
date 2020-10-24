@@ -1,6 +1,7 @@
 // Copyright (c) 2016, Damon Douglas. All rights reserved. Use of this source code
 // is governed by a BSD-style license that can be found in the LICENSE file.
 
+/// Biblioteca para geração de strings aleatórias
 /// Simple library for generating random ascii strings.
 ///
 /// More dartdocs go here.

@@ -9,6 +9,8 @@ const OFFER_EVENT = 'offer-event';
 const ANSWER_EVENT = 'answer-event';
 const ICE_CANDIDATE_EVENT = 'ice-candidate-event';
 
+//esta classe cria um WebSocket, para uso nas comunicações
+
 class SimpleWebSocket {
   String url;
   IO.Socket socket;
