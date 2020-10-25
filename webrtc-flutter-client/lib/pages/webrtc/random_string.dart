@@ -17,7 +17,7 @@
 ///     print(randomAlpha(5)); // random sequence of 5 alpha characters i.e. aRztC
 ///     print(randomAlphaNumeric(10)); // random sequence of 10 alpha numeric i.e. aRztC1y32B
 /// }
-
+//codigo retirado da aplicação de vídeo conferência Flutter WebRTC disponível no Github em <https://github.com/nhancv/nc-flutter-webrtc-ex>
 library random_string;
 
 import 'dart:math';

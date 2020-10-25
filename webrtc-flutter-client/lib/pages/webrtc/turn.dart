@@ -3,7 +3,7 @@ import 'dart:async';
 import 'dart:io';
 
 //esta classe configura o TURN (Traversal Using Relays around NAT)
-
+//codigo retirado da aplicação de vídeo conferência Flutter WebRTC disponível no Github em <https://github.com/nhancv/nc-flutter-webrtc-ex>
 Future<Map> getTurnCredential(String host, int port) async {
   HttpClient client = HttpClient(context: SecurityContext());
   client.badCertificateCallback =

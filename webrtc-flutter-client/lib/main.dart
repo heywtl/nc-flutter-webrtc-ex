@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
+//codigo retirado da aplicação de vídeo conferência Flutter WebRTC disponível no Github em <https://github.com/nhancv/nc-flutter-webrtc-ex>
 import 'package:nft/my_app.dart';
 import 'package:nft/app_config.dart';
 

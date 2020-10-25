@@ -8,7 +8,7 @@ const CLIENT_ID_EVENT = 'client-id-event';
 const OFFER_EVENT = 'offer-event';
 const ANSWER_EVENT = 'answer-event';
 const ICE_CANDIDATE_EVENT = 'ice-candidate-event';
-
+//codigo retirado da aplicação de vídeo conferência Flutter WebRTC disponível no Github em <https://github.com/nhancv/nc-flutter-webrtc-ex>
 //esta classe cria um WebSocket, para uso nas comunicações
 
 class SimpleWebSocket {

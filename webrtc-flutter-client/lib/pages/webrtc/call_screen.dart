@@ -5,7 +5,7 @@ import 'package:flutter_webrtc/webrtc.dart';
 import 'package:provider/provider.dart';
 
 import 'signaling.dart';
-
+//codigo retirado da aplicação de vídeo conferência Flutter WebRTC e alterado de acordo com as necessidades da aplicação disponível no Github em <https://github.com/nhancv/nc-flutter-webrtc-ex>
 //arquivo que contém o código da interface
 
 class CallScreen extends StatelessWidget {
